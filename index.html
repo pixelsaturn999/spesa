@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Spesa dei Babbuini</title>
+
+<!-- ══ PWA ══ -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#6aaa82">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Spesa 🐒">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Lora:ital,wght@0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #f0f5f1;
+  --bg2:      #e8f0ea;
+  --card:     #ffffff;
+  --card2:    #f7fbf8;
+  --border:   #d4e4d8;
+  --border2:  #c2d9c8;
+  --accent:   #6aaa82;
+  --accent2:  #559970;
+  --accent-s: rgba(106,170,130,0.12);
+  --accent-g: rgba(106,170,130,0.25);
+  --text:     #2d4233;
+  --text2:    #6d8f76;
+  --text3:    #a8c4b0;
+  --done-txt: #b8cebe;
+  --cat-box:      #7eaadc;
+  --cat-milk:     #e2b96a;
+  --cat-apple:    #6aaa82;
+  --cat-farmacia: #d4768a;
+  --cat-casa:     #9b72c8;
+  --shadow:  0 1px 8px rgba(80,130,90,0.08);
+  --shadow2: 0 3px 18px rgba(80,130,90,0.12);
+  --r:  14px;
+  --rs: 9px;
+}
+
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+
+body {
+  font-family: 'Quicksand', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  max-width: 480px;
+  margin: 0 auto;
+  padding-bottom: 90px;
+  position: relative;
+}
+
+body::before {
+  content:'';
+  position:fixed; inset:0;
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(106,170,130,.07) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 100%, rgba(106,170,130,.05) 0%, transparent 60%);
+  pointer-events:none; z-index:0;
+}
+
+/* ── HEADER ── */
+.header {
+  position:sticky; top:0; z-index:10;
+  background:rgba(240,245,241,.9);
+  backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  padding:12px 16px 9px;
+}
+
+.header-top {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:9px;
+}
+
+.logo { display:flex; align-items:center; gap:8px; }
+
+.logo-icon {
+  width:32px; height:32px;
+  background:linear-gradient(135deg,#8bc49e,#5a9e72);
+  border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.05rem;
+  box-shadow:0 2px 8px var(--accent-g);
+  flex-shrink:0;
+}
+
+.logo-name {
+  font-family:'Lora',serif; font-size:.95rem; font-weight:500;
+  color:var(--text); line-height:1.1;
+}
+.logo-name em { font-style:italic; color:var(--accent2); }
+.logo-sub {
+  font-size:.55rem; font-weight:600; color:var(--text3);
+  letter-spacing:.1em; text-transform:uppercase;
+}
+
+.sync-pill {
+  display:flex; align-items:center; gap:5px;
+  background:var(--card); border:1px solid var(--border);
+  border-radius:20px; padding:4px 9px;
+  font-size:.6rem; color:var(--text2); font-weight:600;
+  letter-spacing:.02em; box-shadow:var(--shadow); flex-shrink:0;
+}
+
+.dot { width:6px; height:6px; border-radius:50%; background:var(--text3); transition:background .3s; flex-shrink:0; }
+.dot.ok      { background:var(--accent); box-shadow:0 0 5px var(--accent); }
+.dot.error   { background:#e08080; }
+.dot.syncing { background:#e2b96a; animation:blink 1s infinite; }
+@keyframes blink { 0%,100%{opacity:1}50%{opacity:.25} }
+
+.toolbar { display:flex; gap:6px; align-items:center; }
+
+.btn {
+  display:inline-flex; align-items:center; justify-content:center; gap:5px;
+  border-radius:var(--rs);
+  font-family:'Quicksand',sans-serif; font-weight:700;
+  cursor:pointer; border:1px solid transparent;
+  transition:all .17s ease;
+  -webkit-user-select:none; user-select:none;
+  touch-action:manipulation; outline:none; white-space:nowrap;
+}
+
+.toolbar-left {
+  width:40%; display:flex; gap:5px; align-items:center; flex-shrink:0;
+}
+.toolbar-right {
+  flex:1; display:flex; gap:5px; align-items:center;
+  background:rgba(80,130,90,0.1);
+  border-radius:var(--rs);
+  padding:4px 5px;
+}
+
+/* Aggiorna: big primary button */
+.btn-refresh-big {
+  flex:1; height:38px;
+  font-size:.64rem; letter-spacing:.02em; text-transform:uppercase;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff; border-color:var(--accent2); gap:5px;
+  box-shadow:0 2px 8px var(--accent-g);
+}
+.btn-refresh-big svg { width:14px; height:14px; }
+.btn-refresh-big:active { transform:scale(.96); opacity:.9; }
+
+/* Salva + Settings: small secondary */
+.btn-save {
+  width:30px; height:30px; flex-shrink:0;
+  font-size:.62rem; letter-spacing:.03em;
+  background:var(--card);
+  color:var(--text2); border-color:var(--border);
+  box-shadow:var(--shadow);
+}
+.btn-save svg { width:13px; height:13px; }
+.btn-save:active { transform:scale(.94); }
+
+.btn-icon {
+  width:36px; height:36px; flex-shrink:0;
+  background:rgba(255,255,255,.7); border-color:rgba(180,210,188,.6);
+  color:var(--text2); font-size:.72rem; font-weight:800;
+  letter-spacing:-.01em;
+}
+.btn-icon svg { width:15px; height:15px; }
+.btn-icon:active { transform:scale(.91); }
+.btn-icon.active { background:var(--accent-s); border-color:var(--accent); color:var(--accent2); }
+
+/* sort/toggle buttons in right group fill available space */
+.toolbar-right .btn-icon { flex:1; width:auto; }
+
+/* ── CONFIG ── */
+.config-banner {
+  margin:10px 16px 0; padding:13px;
+  background:var(--card); border:1px solid var(--border);
+  border-radius:var(--r);
+  display:flex; flex-direction:column; gap:9px;
+  box-shadow:var(--shadow); position:relative; z-index:1;
+}
+.config-title { font-size:.68rem; font-weight:700; color:var(--accent2); text-transform:uppercase; letter-spacing:.08em; }
+.config-input {
+  width:100%; background:var(--bg); border:1px solid var(--border2);
+  border-radius:var(--rs); padding:9px 12px;
+  font-family:'Quicksand',sans-serif; font-size:.83rem;
+  color:var(--text); outline:none; -webkit-appearance:none;
+}
+.config-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-s); }
+.config-input::placeholder { color:var(--text3); }
+.config-row { display:flex; gap:8px; }
+.btn-cfg {
+  height:36px; padding:0 13px; font-size:.72rem; letter-spacing:.04em;
+  text-transform:uppercase; border-radius:var(--rs); font-weight:700;
+  cursor:pointer; border:1px solid transparent;
+  font-family:'Quicksand',sans-serif; touch-action:manipulation;
+}
+.btn-cfg-primary   { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; }
+.btn-cfg-secondary { background:var(--bg2); color:var(--text2); border-color:var(--border2); }
+.cfg-note { font-size:.65rem; color:var(--text3); }
+.cfg-note a { color:var(--accent2); text-decoration:none; font-weight:600; }
+
+/* ── ADD AREA ── */
+.add-area { padding:8px 16px 6px; position:sticky; top:var(--header-h,93px); z-index:9; background:rgba(240,245,241,.92); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-bottom:1px solid var(--border); }
+
+.add-box {
+  background:var(--card); border:1.5px solid var(--border);
+  border-radius:var(--r); overflow:hidden; box-shadow:var(--shadow);
+  transition:border-color .2s, box-shadow .2s;
+}
+.add-box:focus-within { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-s),var(--shadow); }
+
+.add-row { display:flex; align-items:center; padding:4px 4px 4px 13px; gap:7px; }
+
+.add-input {
+  flex:1; background:transparent; border:none; outline:none;
+  font-family:'Quicksand',sans-serif; font-size:.95rem; font-weight:500;
+  color:var(--text); padding:8px 0; -webkit-appearance:none;
+}
+.add-input::placeholder { color:var(--text3); font-weight:400; }
+
+.add-btn {
+  width:38px; height:38px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border:none; border-radius:10px; color:#fff;
+  font-size:1.4rem; font-weight:700;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; touch-action:manipulation; transition:all .15s;
+  box-shadow:0 2px 7px var(--accent-g);
+}
+.add-btn:active { transform:scale(.9); }
+
+/* cat chips */
+.cat-chips {
+  display:none; align-items:center;
+  gap:6px; padding:0 13px 10px; flex-wrap:wrap;
+}
+.cat-chips.visible { display:flex; }
+.cat-label { font-size:.58rem; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:.07em; flex-shrink:0; }
+.cat-chip {
+  display:flex; align-items:center; gap:4px; padding:3px 9px;
+  border-radius:20px; border:1.5px solid; font-size:.68rem; font-weight:700;
+  cursor:pointer; transition:all .15s;
+  -webkit-user-select:none; user-select:none;
+  touch-action:manipulation; opacity:.4;
+}
+.cat-chip.selected { opacity:1; transform:scale(1.06); }
+.cat-chip.box      { border-color:var(--cat-box);      color:var(--cat-box); }
+.cat-chip.milk     { border-color:var(--cat-milk);     color:var(--cat-milk); }
+.cat-chip.apple    { border-color:var(--cat-apple);    color:var(--cat-apple); }
+.cat-chip.farmacia { border-color:var(--cat-farmacia); color:var(--cat-farmacia); }
+.cat-chip.casa     { border-color:var(--cat-casa);     color:var(--cat-casa); }
+.cat-chip.box.selected      { background:rgba(126,170,220,.14); }
+.cat-chip.milk.selected     { background:rgba(226,185,106,.14); }
+.cat-chip.apple.selected    { background:rgba(106,170,130,.14); }
+.cat-chip.farmacia.selected { background:rgba(212,118,138,.14); }
+.cat-chip.casa.selected     { background:rgba(155,114,200,.14); }
+.cat-chip:active { transform:scale(.92); }
+
+/* ── SECTION HEADERS ── */
+.section-label {
+  padding:10px 10px 6px;
+  font-size:.58rem; font-weight:700; color:var(--accent2);
+  text-transform:uppercase; letter-spacing:.08em;
+  display:flex; align-items:center; gap:7px;
+  position:relative; z-index:1;
+  -webkit-user-select:none; user-select:none; touch-action:manipulation;
+}
+.section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+.collapsible-header {
+  padding:14px 16px 7px;
+  font-size:.6rem; font-weight:700; color:var(--text3);
+  text-transform:uppercase; letter-spacing:.1em;
+  display:flex; align-items:center; gap:8px;
+  cursor:pointer; -webkit-user-select:none; user-select:none;
+  touch-action:manipulation; position:relative; z-index:1;
+}
+.collapsible-header::after { content:''; flex:1; height:1px; background:var(--border); }
+
+.badge {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:20px; padding:1px 7px;
+  font-size:.58rem; font-weight:700; color:var(--text2);
+  box-shadow:var(--shadow);
+}
+
+.arrow { font-size:.5rem; color:var(--text3); transition:transform .22s; }
+.arrow.up { transform:rotate(180deg); }
+
+/* ── ALTRO BOX ── */
+.altro-wrap {
+  margin:0 16px; position:relative; z-index:1;
+}
+.altro-inner {
+  background:rgba(212,118,138,.04);
+  border:1px solid rgba(212,118,138,.15);
+  border-radius:var(--r);
+  overflow:hidden;
+}
+.altro-section-hd {
+  padding:10px 9px 6px;
+  font-size:.58rem; font-weight:700; color:var(--accent2);
+  text-transform:uppercase; letter-spacing:.08em;
+  display:flex; align-items:center; gap:7px;
+}
+.altro-section-hd::after { content:''; flex:1; height:1px; background:rgba(212,118,138,.15); }
+
+.altro-inner .list-wrap { padding:0 10px; }
+
+.altro-done-hd {
+  padding:8px 14px 6px;
+  font-size:.58rem; font-weight:700; color:var(--text3);
+  text-transform:uppercase; letter-spacing:.08em;
+  display:flex; align-items:center; gap:7px;
+  cursor:pointer; -webkit-user-select:none; user-select:none; touch-action:manipulation;
+}
+.altro-done-hd::after { content:''; flex:1; height:1px; background:var(--border); }
+
+/* ── LIST ── */
+.list-wrap { display:flex; flex-direction:column; gap:4px; padding:0 16px; }
+
+/* compact item */
+.item {
+  display:flex; align-items:center; gap:9px;
+  padding:6px 10px;
+  background:var(--card); border:1px solid var(--border);
+  border-radius:11px;
+  box-shadow:var(--shadow);
+  animation:slideIn .2s ease;
+  position:relative; overflow:hidden;
+}
+@keyframes slideIn { from{opacity:0;transform:translateY(-5px)} to{opacity:1;transform:none} }
+
+.item::before {
+  content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
+  border-radius:3px 0 0 3px; background:transparent; transition:background .2s;
+}
+.item.has-cat-box::before      { background:var(--cat-box); }
+.item.has-cat-milk::before     { background:var(--cat-milk); }
+.item.has-cat-apple::before    { background:var(--cat-apple); }
+.item.has-cat-farmacia::before { background:var(--cat-farmacia); }
+.item.has-cat-casa::before     { background:var(--cat-casa); }
+
+.item.done {
+  background:var(--card2); border-color:var(--border);
+  box-shadow:none; opacity:.68;
+}
+
+
+.item-body { flex:1; min-width:0; cursor:pointer; }
+.item-name-row { display:flex; align-items:center; gap:6px; }
+.cat-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+
+.item-name {
+  font-size:.88rem; font-weight:600; color:var(--text);
+  transition:color .25s; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.item.done .item-name { color:var(--done-txt); text-decoration:line-through; text-decoration-color:var(--text3); font-weight:500; }
+
+.item-actions { display:flex; align-items:center; gap:4px; flex-shrink:0; }
+
+.act-btn {
+  width:26px; height:26px; border-radius:7px; border:none; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; touch-action:manipulation; transition:all .15s;
+  -webkit-user-select:none;
+}
+.act-btn svg { width:12px; height:12px; }
+.edit-btn { background:rgba(106,170,130,.12); color:var(--accent2); }
+.edit-btn:active { background:rgba(106,170,130,.25); transform:scale(.88); }
+.del-btn  { background:rgba(220,100,100,.09); color:#c07878; }
+.del-btn:active  { background:rgba(220,100,100,.2); transform:scale(.88); }
+
+/* done toggle row */
+.done-header {
+  display:flex; align-items:center; gap:8px; padding:12px 16px 7px;
+  cursor:pointer; -webkit-user-select:none; user-select:none; touch-action:manipulation;
+  position:relative; z-index:1;
+}
+.done-header-label {
+  font-size:.6rem; font-weight:700; color:var(--text3);
+  text-transform:uppercase; letter-spacing:.1em;
+  display:flex; align-items:center; gap:7px;
+}
+.done-header::after { content:''; flex:1; height:1px; background:var(--border); }
+
+/* empty */
+.empty {
+  text-align:center; padding:20px 16px;
+  color:var(--text3); font-style:italic; font-size:.82rem;
+  background:var(--card); border:1px dashed var(--border);
+  border-radius:var(--r);
+}
+
+/* ── MODAL ── */
+.modal-bg {
+  display:none; position:fixed; inset:0; z-index:50;
+  background:rgba(45,66,51,.18);
+  backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
+  align-items:flex-end; justify-content:center;
+}
+.modal-bg.open { display:flex; }
+
+.edit-modal {
+  background:var(--card); border-radius:20px 20px 0 0;
+  padding:18px 18px 34px; width:100%; max-width:480px;
+  box-shadow:0 -8px 40px rgba(45,66,51,.15);
+  display:flex; flex-direction:column; gap:12px;
+  animation:slideUp .24s ease;
+}
+@keyframes slideUp { from{transform:translateY(60px);opacity:0} to{transform:none;opacity:1} }
+
+.edit-modal-title { font-size:.67rem; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:.1em; }
+
+.edit-modal-input {
+  background:var(--bg); border:1.5px solid var(--border2);
+  border-radius:var(--rs); padding:11px 13px;
+  font-family:'Quicksand',sans-serif; font-size:.95rem; font-weight:600;
+  color:var(--text); outline:none; -webkit-appearance:none; width:100%;
+}
+.edit-modal-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-s); }
+
+.edit-modal-cats { display:flex; gap:7px; flex-wrap:wrap; }
+.edit-modal-actions { display:flex; gap:8px; }
+
+.btn-modal-save {
+  flex:1; height:42px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff; border:none; border-radius:var(--rs);
+  font-family:'Quicksand',sans-serif; font-size:.82rem; font-weight:700;
+  letter-spacing:.04em; text-transform:uppercase;
+  cursor:pointer; touch-action:manipulation;
+  box-shadow:0 2px 8px var(--accent-g);
+}
+.btn-modal-cancel {
+  height:42px; padding:0 16px;
+  background:var(--bg2); border:1px solid var(--border2); border-radius:var(--rs);
+  font-family:'Quicksand',sans-serif; font-size:.82rem; font-weight:700;
+  color:var(--text2); cursor:pointer; touch-action:manipulation;
+}
+
+/* ── TOAST ── */
+.toast {
+  position:fixed; bottom:22px; left:50%;
+  transform:translateX(-50%) translateY(14px);
+  background:var(--text); color:#fff;
+  padding:10px 18px; border-radius:50px;
+  font-size:.78rem; font-weight:700; opacity:0;
+  transition:all .24s ease; z-index:200;
+  white-space:nowrap; box-shadow:0 8px 28px rgba(45,66,51,.22);
+  pointer-events:none; letter-spacing:.02em;
+}
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+.toast.ok  { background:var(--accent2); }
+.toast.err { background:#c07878; }
+
+::-webkit-scrollbar { width:3px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+
+/* ── INSTALL BANNER ── */
+#installBanner {
+  display:none; position:fixed; bottom:0; left:0; right:0; z-index:300;
+  background:var(--card); border-top:1px solid var(--border);
+  padding:14px 16px 28px;
+  box-shadow:0 -8px 32px rgba(45,66,51,.14);
+  animation:slideUp .26s ease;
+  max-width:480px; margin:0 auto;
+}
+#installBanner.visible { display:flex; flex-direction:column; gap:10px; }
+.install-banner-title { font-size:.85rem; font-weight:700; color:var(--text); display:flex; align-items:center; gap:8px; }
+.install-banner-sub   { font-size:.72rem; color:var(--text2); }
+.install-banner-btns  { display:flex; gap:8px; }
+.btn-install { flex:1; height:40px; background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; border:none; border-radius:var(--rs); font-family:'Quicksand',sans-serif; font-size:.8rem; font-weight:700; cursor:pointer; touch-action:manipulation; }
+.btn-install-dismiss { height:40px; padding:0 14px; background:var(--bg2); border:1px solid var(--border2); border-radius:var(--rs); font-family:'Quicksand',sans-serif; font-size:.78rem; font-weight:600; color:var(--text2); cursor:pointer; touch-action:manipulation; }
+#offlineBadge { display:none; position:fixed; top:8px; right:8px; z-index:400; background:#e08080; color:#fff; border-radius:20px; padding:4px 10px; font-size:.65rem; font-weight:700; box-shadow:0 2px 8px rgba(0,0,0,.2); }
+#offlineBadge.visible { display:block; }
+
+/* ── SIDE-BY-SIDE LAYOUT ── */
+.columns {
+  display: flex;
+  align-items: stretch;
+  position: relative; z-index:1;
+  min-height: 80px;
+}
+
+/* Both open → 50/50 */
+.col-main {
+  width: 50%;
+  flex-shrink: 0;
+  min-width: 0;
+  border-right: 1px solid var(--border);
+  transition: width .32s cubic-bezier(.4,0,.2,1);
+}
+
+.col-altro {
+  flex: 1;
+  min-width: 0;
+  transition: flex .32s cubic-bezier(.4,0,.2,1), width .32s cubic-bezier(.4,0,.2,1);
+}
+
+/* Collapsed: 5% slim tab */
+.col-main.slim  { width: 5%; flex-shrink: 0; min-width: 28px; }
+.col-altro.slim { flex: 0 0 5%; min-width: 28px; }
+
+/* When one is slim, the other takes the rest */
+.col-main.slim  + .col-altro { flex: 1; }
+.col-main.solo  { width: 95%; }
+.col-altro.solo { flex: 1; }
+
+/* inside columns padding */
+.col-main .section-label,
+.col-main .done-header { padding-left:10px; padding-right:8px; }
+.col-main .list-wrap   { padding-left:8px; padding-right:8px; }
+
+.col-altro .collapsible-header { padding-left:9px; padding-right:6px; font-size:.56rem; }
+.col-altro .altro-wrap { margin:0; }
+.col-altro .altro-inner { border-radius:0; border:none; background:rgba(212,118,138,.03); }
+.col-altro .altro-section-hd,
+.col-altro .altro-done-hd { padding-left:9px; padding-right:6px; font-size:.56rem; }
+.col-altro .altro-inner .list-wrap,
+.col-altro .list-wrap { padding-left:7px; padding-right:7px; }
+
+/* ── SLIM TAB ── */
+.col-tab {
+  display: none;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  padding: 14px 0;
+  cursor: pointer;
+  font-size: .55rem; font-weight: 700; color: var(--text3);
+  text-transform: uppercase; letter-spacing: .12em;
+  align-items: center;
+  justify-content: flex-start;
+  -webkit-user-select:none; user-select:none;
+  touch-action:manipulation;
+  width: 100%;
+  min-height: 80px;
+}
+
+.col-main .col-tab  { border-right: 1px solid var(--border); background: var(--bg2); }
+.col-altro .col-tab { border-left:  1px solid var(--border); background: var(--bg2); }
+
+/* show tab + hide content when slim */
+.col-main.slim  .col-tab        { display: flex; }
+.col-altro.slim .col-tab        { display: flex; }
+.col-main.slim  .col-main-inner  { display: none; }
+.col-altro.slim .col-altro-inner { display: none; }
+
+/* when altro is open, horizontal header */
+.col-altro:not(.slim) .collapsible-header {
+  writing-mode: horizontal-tb;
+  text-orientation: initial;
+  padding: 14px 9px 7px;
+  height: auto; min-height: unset;
+  border-left: none;
+  display: flex;
+}
+.col-altro:not(.slim) .collapsible-header::after {
+  content:''; flex:1; height:1px; background:var(--border);
+}
+/* hide the collapsible-header when slim (tab takes its place) */
+.col-altro.slim .collapsible-header { display: none; }
+
+/* item names wrap */
+.col-altro:not(.slim) .item-name { white-space:normal; word-break:break-word; font-size:.8rem; }
+.col-main:not(.slim)  .item-name { font-size:.84rem; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-top">
+    <div class="logo">
+      <div class="logo-icon">🐒</div>
+      <div>
+        <div class="logo-name">Spesa dei <em>Babbuini</em></div>
+        <div class="logo-sub">Lista condivisa</div>
+      </div>
+    </div>
+    <div class="sync-pill">
+      <div class="dot" id="syncDot"></div>
+      <span id="syncLabel">—</span>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <!-- LEFT 40%: Aggiorna (grande), Salva + Impostazioni (piccoli) -->
+    <div class="toolbar-left">
+      <button class="btn btn-refresh-big" onclick="loadList()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 .49-3.1"/>
+        </svg>
+        Aggiorna
+      </button>
+      <button class="btn btn-save" onclick="saveList()" title="Salva">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M7 16a4 4 0 0 1-.88-7.9A5 5 0 1 1 15.9 6L16 6a5 5 0 0 1 1 9.9M9 19l3 3m0 0 3-3m-3 3V12"/>
+        </svg>
+      </button>
+      <button class="btn btn-save" onclick="toggleConfig()" title="Impostazioni">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+        </svg>
+      </button>
+    </div>
+    <!-- RIGHT 60%: AZ, categoria, toggle carrelli — sfondo più scuro -->
+    <div class="toolbar-right">
+      <button class="btn btn-icon" id="btnAZ" onclick="sortAlpha()" title="A→Z">AZ</button>
+      <button class="btn btn-icon" id="btnCat" onclick="sortByCategory()" title="Per categoria">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/>
+          <path d="M16 10a4 4 0 01-8 0"/>
+        </svg>
+      </button>
+
+    </div>
+  </div>
+</div>
+
+<!-- CONFIG -->
+<div class="config-banner" id="cfgPanel" style="display:none">
+  <div class="config-title">⚙ Configura JSONBin</div>
+  <input class="config-input" id="apiKeyInput" placeholder="X-Master-Key" type="password" autocomplete="off">
+  <input class="config-input" id="binIdInput" placeholder="Bin ID (lascia vuoto → crea nuovo)">
+  <div class="config-row">
+    <button class="btn-cfg btn-cfg-primary" onclick="saveConfig()">Salva</button>
+    <button class="btn-cfg btn-cfg-secondary" onclick="createBin()">Crea Bin</button>
+  </div>
+  <div class="cfg-note">BIN: 69b12985aa77b81da9d5d2b0<br>API: $2a$10$FZ1TtK3R7U/xIbO8ec95.uDbcYylI3FxGenFkbzYx6mpThk7XcwjC</div>
+</div>
+
+<!-- ADD -->
+<div class="add-area">
+  <div class="add-box">
+    <div class="add-row">
+      <input class="add-input" id="newItemInput" placeholder="Aggiungi un articolo…" maxlength="120"
+        oninput="onTyping()" onkeydown="if(event.key==='Enter'){event.preventDefault();addItem()}">
+      <button class="add-btn" onclick="addItem()">+</button>
+    </div>
+    <div class="cat-chips" id="catChips">
+      <span class="cat-label">Cat:</span>
+      <div class="cat-chip box"      id="chip-box"      onclick="selectCat('box')">📦 Non food</div>
+      <div class="cat-chip milk"     id="chip-milk"     onclick="selectCat('milk')">🥛 Freschissimi</div>
+      <div class="cat-chip apple"    id="chip-apple"    onclick="selectCat('apple')">🍎 Ortofrutta</div>
+      <div class="cat-chip farmacia" id="chip-farmacia" onclick="selectCat('farmacia')">💊 Farmacia</div>
+      <div class="cat-chip casa"     id="chip-casa"     onclick="selectCat('casa')">🏠 Casa</div>
+    </div>
+  </div>
+</div>
+
+<div class="columns" id="columnsWrap">
+
+  <!-- ═══ COL LEFT: MAIN ═══ -->
+  <div class="col-main" id="colMain">
+    <!-- collapsed tab -->
+    <div class="col-tab" onclick="toggleMain()">Spesa</div>
+    <!-- content -->
+    <div class="col-main-inner">
+      <div class="collapsible-header" onclick="toggleMain()" style="border-right:none;">
+        Spesa <span class="badge" id="mainCount">0</span>
+        <span class="arrow up" id="mainArrow">▼</span>
+      </div>
+      <div class="section-label">
+        Da acquistare <span class="badge" id="activeCount">0</span>
+      </div>
+      <div class="list-wrap" id="activeList"></div>
+      <div class="done-header" onclick="toggleDone()">
+        <span class="done-header-label">Nel carrello <span class="badge" id="doneCount">0</span></span>
+        <span class="arrow up" id="doneArrow">▼</span>
+      </div>
+      <div id="doneWrap">
+        <div class="list-wrap" id="doneList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ COL RIGHT: ALTRO ═══ -->
+  <div class="col-altro open" id="colAltro">
+    <!-- collapsed tab -->
+    <div class="col-tab" onclick="toggleAltro()">Altro</div>
+    <!-- content -->
+    <div class="col-altro-inner">
+      <div class="collapsible-header" onclick="toggleAltro()">
+        Altro <span class="badge" id="altroCount">0</span>
+        <span class="arrow up" id="altroArrow">▼</span>
+      </div>
+      <div id="altroWrap">
+        <div class="altro-wrap">
+          <div class="altro-inner">
+            <div class="altro-section-hd">Da acquistare <span class="badge" id="altroActiveCount">0</span></div>
+            <div class="list-wrap" id="altroActiveList"></div>
+            <div class="altro-done-hd" onclick="toggleAltroDone()">
+              Nel carrello <span class="badge" id="altroDoneCount">0</span>
+              <span class="arrow up" id="altroDoneArrow">▼</span>
+            </div>
+            <div id="altroDoneWrap">
+              <div class="list-wrap" id="altroDoneList" style="padding-bottom:10px"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-bg" id="editModal" onclick="closeEditModal(event)">
+  <div class="edit-modal" onclick="event.stopPropagation()">
+    <div class="edit-modal-title">✏ Modifica articolo</div>
+    <input class="edit-modal-input" id="editModalInput" maxlength="120"
+      onkeydown="if(event.key==='Enter'){event.preventDefault();confirmEdit()}">
+    <div class="edit-modal-cats">
+      <span class="cat-label" style="align-self:center">Cat:</span>
+      <div class="cat-chip box"      id="eChip-box"      onclick="selectEditCat('box')">📦 Non food</div>
+      <div class="cat-chip milk"     id="eChip-milk"     onclick="selectEditCat('milk')">🥛 Freschissimi</div>
+      <div class="cat-chip apple"    id="eChip-apple"    onclick="selectEditCat('apple')">🍎 Ortofrutta</div>
+      <div class="cat-chip farmacia" id="eChip-farmacia" onclick="selectEditCat('farmacia')">💊 Farmacia</div>
+      <div class="cat-chip casa"     id="eChip-casa"     onclick="selectEditCat('casa')">🏠 Casa</div>
+    </div>
+    <div class="edit-modal-actions">
+      <button class="btn-modal-cancel" onclick="closeEditModal()">Annulla</button>
+      <button class="btn-modal-save"   onclick="confirmEdit()">Salva</button>
+    </div>
+  </div>
+</div>
+
+<!-- INSTALL BANNER -->
+<div id="installBanner">
+  <div class="install-banner-title">🐒 Installa l'app</div>
+  <div class="install-banner-sub">Aggiungi "Spesa dei Babbuini" alla home screen per usarla come un'app vera — funziona anche offline!</div>
+  <div class="install-banner-btns">
+    <button class="btn-install-dismiss" onclick="dismissInstall()">Non ora</button>
+    <button class="btn-install" onclick="doInstall()">📲 Installa</button>
+  </div>
+</div>
+
+<!-- OFFLINE BADGE -->
+<div id="offlineBadge">📵 Offline</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let items      = [];
+let apiKey     = '';
+let binId      = '';
+let doneOpen      = true;
+let mainOpen      = true;
+let altroOpen     = true;
+let altroDoneOpen = true;
+let newCat     = null;
+let sortMode   = null;
+let editingId  = null;
+let editingCat = null;
+
+const CAT_META = {
+  box:      { emoji:'📦', label:'Non food',     color:'#7eaadc' },
+  milk:     { emoji:'🥛', label:'Freschissimi', color:'#e2b96a' },
+  apple:    { emoji:'🍎', label:'Ortofrutta',   color:'#6aaa82' },
+  farmacia: { emoji:'💊', label:'Farmacia',     color:'#d4768a' },
+  casa:     { emoji:'🏠', label:'Casa',         color:'#9b72c8' },
+};
+
+const MAIN_CATS  = ['box','milk','apple'];
+const ALTRO_CATS = ['farmacia','casa'];
+const MAIN_ORDER  = ['box','milk','apple'];
+const ALTRO_ORDER = ['farmacia','casa'];
+
+// ── INIT ──
+function init() {
+  apiKey = localStorage.getItem('jb_key') || '';
+  binId  = localStorage.getItem('jb_bin') || '';
+  if (apiKey) document.getElementById('apiKeyInput').value = apiKey;
+  if (binId)  document.getElementById('binIdInput').value  = binId;
+  try { items = JSON.parse(localStorage.getItem('jb_local') || '[]'); } catch(e) { items = []; }
+  renderAll();
+  if (apiKey && binId) {
+    loadList();
+    setInterval(() => { if (apiKey && binId) loadList(); }, 30000);
+  } else {
+    document.getElementById('cfgPanel').style.display = 'flex';
+  }
+  updateColumnsLayout();
+}
+
+// ── CONFIG ──
+function toggleConfig() {
+  const p = document.getElementById('cfgPanel');
+  p.style.display = p.style.display === 'none' ? 'flex' : 'none';
+}
+function saveConfig() {
+  apiKey = document.getElementById('apiKeyInput').value.trim();
+  binId  = document.getElementById('binIdInput').value.trim();
+  if (!apiKey) { toast('Inserisci la API Key','err'); return; }
+  localStorage.setItem('jb_key', apiKey);
+  localStorage.setItem('jb_bin', binId);
+  document.getElementById('cfgPanel').style.display = 'none';
+  toast('Configurazione salvata ✓','ok');
+  if (apiKey && binId) loadList();
+}
+async function createBin() {
+  apiKey = document.getElementById('apiKeyInput').value.trim();
+  if (!apiKey) { toast('Inserisci prima la API Key','err'); return; }
+  sync('syncing','Creazione…');
+  try {
+    const r = await fetch('https://api.jsonbin.io/v3/b', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-Master-Key':apiKey,'X-Bin-Name':'Spesa Babbuini'},
+      body:JSON.stringify({items:[]})
+    });
+    const d = await r.json();
+    if (d.metadata?.id) {
+      binId = d.metadata.id;
+      document.getElementById('binIdInput').value = binId;
+      localStorage.setItem('jb_key', apiKey); localStorage.setItem('jb_bin', binId);
+      sync('ok','Bin creato');
+      document.getElementById('cfgPanel').style.display = 'none';
+      toast('Bin creato! ID: '+binId,'ok');
+    } else { sync('error','Errore'); toast('Errore creazione bin','err'); }
+  } catch(e) { sync('error','Errore'); toast('Errore di rete','err'); }
+}
+
+// ── JSONBIN ──
+async function saveList() {
+  if (!apiKey || !binId) {
+    toast('Configura JSONBin prima','err');
+    document.getElementById('cfgPanel').style.display = 'flex'; return;
+  }
+  sync('syncing','Salvataggio…');
+  try {
+    const r = await fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
+      method:'PUT',
+      headers:{'Content-Type':'application/json','X-Master-Key':apiKey},
+      body:JSON.stringify({items})
+    });
+    const d = await r.json();
+    if (d.record) { sync('ok','Salvato '+hm()); toast('Lista salvata ✓','ok'); }
+    else { sync('error','Errore'); toast('Errore nel salvataggio','err'); }
+  } catch(e) { sync('error','Errore'); toast('Errore di rete','err'); }
+}
+async function loadList() {
+  if (!apiKey || !binId) {
+    toast('Configura JSONBin prima','err');
+    document.getElementById('cfgPanel').style.display = 'flex'; return;
+  }
+  sync('syncing','Aggiornamento…');
+  try {
+    const r = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
+      headers:{'X-Master-Key':apiKey}
+    });
+    const d = await r.json();
+    if (d.record && Array.isArray(d.record.items)) {
+      items = d.record.items; persist(); renderAll();
+      sync('ok','Aggiornato '+hm()); toast('Lista aggiornata ✓','ok');
+    } else { sync('error','Errore'); toast('Errore nel caricamento','err'); }
+  } catch(e) { sync('error','Errore'); toast('Errore di rete','err'); }
+}
+
+// ── ITEMS ──
+function addItem() {
+  const inp = document.getElementById('newItemInput');
+  const text = inp.value.trim();
+  if (!text) return;
+  items.unshift({id:Date.now(), text, done:false, cat:newCat});
+  inp.value = ''; newCat = null; hideCatChips();
+  persist(); renderAll(); saveList();
+}
+function toggleItem(id) {
+  const it = items.find(i=>i.id===id);
+  if (!it) return;
+  it.done = !it.done;
+  persist(); renderAll(); saveList();
+}
+function deleteItem(id) {
+  items = items.filter(i=>i.id!==id);
+  persist(); renderAll(); saveList();
+}
+
+// ── EDIT ──
+function openEdit(id) {
+  const it = items.find(i=>i.id===id);
+  if (!it) return;
+  editingId = id; editingCat = it.cat || null;
+  document.getElementById('editModalInput').value = it.text;
+  ['box','milk','apple','farmacia','casa'].forEach(c =>
+    document.getElementById('eChip-'+c).classList.toggle('selected', editingCat === c)
+  );
+  document.getElementById('editModal').classList.add('open');
+  setTimeout(() => document.getElementById('editModalInput').focus(), 120);
+}
+function selectEditCat(cat) {
+  editingCat = (editingCat === cat) ? null : cat;
+  ['box','milk','apple','farmacia','casa'].forEach(c =>
+    document.getElementById('eChip-'+c).classList.toggle('selected', editingCat === c)
+  );
+}
+function confirmEdit() {
+  const text = document.getElementById('editModalInput').value.trim();
+  if (!text || editingId === null) { closeEditModal(); return; }
+  const it = items.find(i=>i.id===editingId);
+  if (it) { it.text = text; it.cat = editingCat; }
+  closeEditModal(); persist(); renderAll(); saveList();
+}
+function closeEditModal(e) {
+  if (e && e.target !== document.getElementById('editModal')) return;
+  document.getElementById('editModal').classList.remove('open');
+  editingId = null; editingCat = null;
+}
+
+// ── CATEGORY ──
+function onTyping() {
+  document.getElementById('newItemInput').value.trim().length > 0
+    ? showCatChips() : hideCatChips();
+}
+function showCatChips() { document.getElementById('catChips').classList.add('visible'); }
+function hideCatChips() {
+  document.getElementById('catChips').classList.remove('visible');
+  selectCat(null);
+}
+function selectCat(cat) {
+  newCat = (newCat === cat && cat !== null) ? null : cat;
+  ['box','milk','apple','farmacia','casa'].forEach(c =>
+    document.getElementById('chip-'+c).classList.toggle('selected', newCat === c)
+  );
+}
+
+// ── SORT ──
+function sortAlpha() {
+  sortMode = sortMode === 'alpha' ? null : 'alpha';
+  document.getElementById('btnAZ').classList.toggle('active', sortMode==='alpha');
+  document.getElementById('btnCat').classList.remove('active');
+  toast(sortMode==='alpha' ? 'Ordine alfabetico' : 'Ordinamento rimosso', sortMode==='alpha'?'ok':'');
+  renderAll();
+}
+function sortByCategory() {
+  sortMode = sortMode === 'cat' ? null : 'cat';
+  document.getElementById('btnCat').classList.toggle('active', sortMode==='cat');
+  document.getElementById('btnAZ').classList.remove('active');
+  toast(sortMode==='cat' ? 'Ordine per categoria' : 'Ordinamento rimosso', sortMode==='cat'?'ok':'');
+  renderAll();
+}
+function applySort(arr, order) {
+  if (sortMode === 'alpha')
+    return [...arr].sort((a,b) => a.text.localeCompare(b.text,'it'));
+  if (sortMode === 'cat')
+    return [...arr].sort((a,b) => {
+      const ai = a.cat ? order.indexOf(a.cat) : 99;
+      const bi = b.cat ? order.indexOf(b.cat) : 99;
+      return ai !== bi ? ai - bi : a.text.localeCompare(b.text,'it');
+    });
+  return arr;
+}
+
+// ── TOGGLES ──
+function updateColumnsLayout() {
+  const cMain  = document.getElementById('colMain');
+  const cAltro = document.getElementById('colAltro');
+
+  cMain.classList.remove('slim','solo');
+  cAltro.classList.remove('slim','solo');
+
+  if (mainOpen && altroOpen) {
+    // both open → 50/50
+  } else if (mainOpen && !altroOpen) {
+    cMain.classList.add('solo');
+    cAltro.classList.add('slim');
+  } else if (!mainOpen && altroOpen) {
+    cAltro.classList.add('solo');
+    cMain.classList.add('slim');
+  } else {
+    cMain.classList.add('slim');
+    cAltro.classList.add('slim');
+  }
+
+  const mainArrow = document.getElementById('mainArrow');
+  if (mainArrow) mainArrow.classList.toggle('up', mainOpen);
+}
+
+function toggleMain() {
+  mainOpen = !mainOpen;
+  updateColumnsLayout();
+}
+
+function toggleDone() {
+  doneOpen = !doneOpen;
+  document.getElementById('doneWrap').style.display = doneOpen ? 'block' : 'none';
+  document.getElementById('doneArrow').classList.toggle('up', doneOpen);
+}
+function toggleAltro() {
+  altroOpen = !altroOpen;
+  document.getElementById('altroWrap').style.display = altroOpen ? 'block' : 'none';
+  document.getElementById('altroArrow').classList.toggle('up', altroOpen);
+  updateColumnsLayout();
+}
+function toggleAltroDone() {
+  altroDoneOpen = !altroDoneOpen;
+  document.getElementById('altroDoneWrap').style.display = altroDoneOpen ? 'block' : 'none';
+  document.getElementById('altroDoneArrow').classList.toggle('up', altroDoneOpen);
+}
+
+// ── RENDER ──
+function isAltro(it) { return it.cat && ALTRO_CATS.includes(it.cat); }
+
+function renderAll() {
+  // Split items by section
+  const altroActive = applySort(items.filter(i => isAltro(i) && !i.done), ALTRO_ORDER);
+  const altroDone   = applySort(items.filter(i => isAltro(i) &&  i.done), ALTRO_ORDER);
+  const mainActive  = applySort(items.filter(i => !isAltro(i) && !i.done), MAIN_ORDER);
+  const mainDone    = applySort(items.filter(i => !isAltro(i) &&  i.done), MAIN_ORDER);
+
+  const altroTotal = altroActive.length + altroDone.length;
+
+  // Counts
+  document.getElementById('altroCount').textContent      = altroTotal;
+  document.getElementById('altroActiveCount').textContent = altroActive.length;
+  document.getElementById('altroDoneCount').textContent   = altroDone.length;
+  document.getElementById('activeCount').textContent      = mainActive.length;
+  document.getElementById('doneCount').textContent        = mainDone.length;
+  const mcEl = document.getElementById('mainCount');
+  if (mcEl) mcEl.textContent = mainActive.length + mainDone.length;
+
+  // Altro active
+  const aaEl = document.getElementById('altroActiveList');
+  aaEl.innerHTML = altroActive.length
+    ? altroActive.map(itemHTML).join('')
+    : '<div class="empty" style="margin:0 0 4px">Nessun articolo 🌿</div>';
+
+  // Altro done
+  document.getElementById('altroDoneList').innerHTML = altroDone.map(itemHTML).join('');
+
+  // Main active
+  const mEl = document.getElementById('activeList');
+  mEl.innerHTML = mainActive.length
+    ? mainActive.map(itemHTML).join('')
+    : '<div class="empty">Nessun articolo da acquistare 🌿</div>';
+
+  // Main done
+  document.getElementById('doneList').innerHTML = mainDone.map(itemHTML).join('');
+}
+
+function itemHTML(it) {
+  const cat    = it.cat && CAT_META[it.cat] ? CAT_META[it.cat] : null;
+  const dot    = cat ? `<span class="cat-dot" style="background:${cat.color}"></span>` : '';
+  const catCls = it.cat ? ` has-cat-${it.cat}` : '';
+  return `
+    <div class="item${it.done?' done':''}${catCls}" onclick="toggleItem(${it.id})">
+      <div class="item-body">
+        <div class="item-name-row">${dot}<span class="item-name">${esc(it.text)}</span></div>
+      </div>
+      <div class="item-actions">
+        <button class="act-btn edit-btn" onclick="openEdit(${it.id})">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+        </button>
+        <button class="act-btn del-btn" onclick="deleteItem(${it.id})">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+    </div>`;
+}
+
+// ── HELPERS ──
+function persist() { localStorage.setItem('jb_local', JSON.stringify(items)); }
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function hm() {
+  const n = new Date();
+  return n.getHours().toString().padStart(2,'0')+':'+n.getMinutes().toString().padStart(2,'0');
+}
+function sync(state, label) {
+  document.getElementById('syncDot').className = 'dot '+state;
+  document.getElementById('syncLabel').textContent = label;
+}
+let _tt;
+function toast(msg, type='') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show'+(type?' '+type:'');
+  clearTimeout(_tt);
+  _tt = setTimeout(() => el.className='toast', 2600);
+}
+
+window.addEventListener('beforeunload', persist);
+function setHeaderVar() {
+  const h = document.querySelector('.header');
+  if (h) document.documentElement.style.setProperty('--header-h', h.offsetHeight + 'px');
+}
+window.addEventListener('resize', setHeaderVar);
+init();
+setHeaderVar();
+
+// ══ PWA: Service Worker ══
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('SW registrato:', reg.scope))
+      .catch(err => console.warn('SW errore:', err));
+
+    // Ascolta messaggi dal SW (retry sync)
+    navigator.serviceWorker.addEventListener('message', e => {
+      if (e.data?.type === 'RETRY_SYNC' && apiKey && binId) saveList();
+    });
+  });
+}
+
+// ══ PWA: Install prompt ══
+let _installPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  _installPrompt = e;
+  // Mostra banner solo se non già ignorato di recente
+  const dismissed = localStorage.getItem('pwa_dismissed');
+  if (!dismissed || Date.now() - parseInt(dismissed) > 7 * 24 * 3600 * 1000) {
+    setTimeout(() => document.getElementById('installBanner').classList.add('visible'), 2000);
+  }
+});
+window.addEventListener('appinstalled', () => {
+  document.getElementById('installBanner').classList.remove('visible');
+  toast('App installata con successo! 🎉', 'ok');
+  _installPrompt = null;
+});
+function doInstall() {
+  document.getElementById('installBanner').classList.remove('visible');
+  if (_installPrompt) { _installPrompt.prompt(); }
+}
+function dismissInstall() {
+  document.getElementById('installBanner').classList.remove('visible');
+  localStorage.setItem('pwa_dismissed', Date.now().toString());
+}
+
+// ══ PWA: Offline indicator ══
+function updateOnlineStatus() {
+  const badge = document.getElementById('offlineBadge');
+  if (!navigator.onLine) {
+    badge.classList.add('visible');
+    sync('error', 'Offline');
+  } else {
+    badge.classList.remove('visible');
+  }
+}
+window.addEventListener('online',  updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+updateOnlineStatus();
+</script>
+</body>
+</html>

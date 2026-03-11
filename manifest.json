@@ -1,0 +1,25 @@
+{
+  "name": "Spesa dei Babbuini",
+  "short_name": "Spesa 🐒",
+  "description": "Lista della spesa condivisa e sincronizzata",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f0f5f1",
+  "theme_color": "#6aaa82",
+  "orientation": "portrait-primary",
+  "lang": "it",
+  "categories": ["lifestyle", "utilities"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Aggiungi articolo",
+      "short_name": "Aggiungi",
+      "description": "Aggiungi un articolo alla lista",
+      "url": "./index.html#add",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
