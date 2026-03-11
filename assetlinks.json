@@ -1,8 +1,0 @@
-[{
-      "relation": ["delegate_permission/common.handle_all_urls"],
-      "target": {
-        "namespace": "android_app",
-        "package_name": "io.github.pixelsaturn999.twa",
-        "sha256_cert_fingerprints": ["FF:5B:82:7C:8B:52:4E:5C:0B:56:80:9A:24:40:FD:CE:29:80:10:A8:F9:E0:A7:10:31:43:37:9A:84:D6:89:97"]
-      }
-    }]
